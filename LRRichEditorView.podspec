@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage         = "https://github.com/cjwirth/RichEditorView"
   s.license          = 'BSD 3-clause'
   s.author           = { "Caesar Wirth" => "cjwirth@gmail.com" }
-  s.source           = { :git => "https://github.com/cjwirth/RichEditorView.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/karlcool/LRRichEditorView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/cjwirth'
 
   s.platform     = :ios, '8.0'
