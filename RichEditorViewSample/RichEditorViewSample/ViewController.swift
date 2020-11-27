@@ -26,7 +26,8 @@ class ViewController: UIViewController {
         editorView.delegate = self
         editorView.inputAccessoryView = toolbar
         editorView.placeholder = "Type some text..."
-
+        editorView.innerLineHeight = 20
+        
         toolbar.delegate = self
         toolbar.editor = editorView
 
@@ -81,7 +82,7 @@ extension ViewController: RichEditorToolbarDelegate {
     }
 
     func richEditorToolbarInsertImage(_ toolbar: RichEditorToolbar) {
-        toolbar.editor?.insertImage("https://gravatar.com/avatar/696cf5da599733261059de06c4d1fe22", alt: "Gravatar")
+        toolbar.editor?.insertImage("https://gravatar.com/avatar/696cf5da599733261059de06c4d1fe22", alt: "Gravatar", width: "100%")
     }
 
     func richEditorToolbarInsertLink(_ toolbar: RichEditorToolbar) {

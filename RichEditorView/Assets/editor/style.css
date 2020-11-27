@@ -55,7 +55,6 @@ div {
     height: 100%;
     overflow: auto;
     display: block;
-    font-family: 'HelveticaNeue';
-    color:#666666;
-    font-size: 12pt;
+    color:#333333;
+    font-size: 13pt;
 }
