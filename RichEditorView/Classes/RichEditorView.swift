@@ -82,6 +82,8 @@ import UIKit
             delegate?.richEditor?(self, heightDidChange: editorHeight)
         }
     }
+    
+    open var isInputting = false
 
     /// The value we hold in order to be able to set the line height before the JS completely loads.
     open var innerLineHeight: Int = 20
@@ -514,6 +516,7 @@ import UIKit
             delegate?.richEditorTookFocus?(self)
         }
         else if method.hasPrefix("blur") {
+            isInputting = false
             delegate?.richEditorLostFocus?(self)
         }
         else if method.hasPrefix("action/") {
@@ -535,6 +538,7 @@ import UIKit
     /// If we are not already the first responder, focus the editor.
     @objc private func viewWasTapped() {
         if !webView.containsFirstResponder {
+            isInputting = true
             let point = tapRecognizer.location(in: webView)
             focus(at: point)
         }
@@ -551,7 +555,14 @@ import UIKit
 
     open override func resignFirstResponder() -> Bool {
         blur()
+        endEditing(true)
         return true
     }
 
+    open override func endEditing(_ force: Bool) -> Bool {
+        let result = super.endEditing(force)
+        isInputting = false
+        delegate?.richEditorLostFocus?(self)
+        return result
+    }
 }
