@@ -25,16 +25,14 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        editorView.font = .systemFont(ofSize: 15)
         editorView.delegate = self
-//        editorView.inputAccessoryView = toolbar
+        editorView.inputAccessoryView = toolbar
         editorView.placeholder = "Type some text..."
-//        editorView.innerLineHeight = 20
-        
+
         toolbar.delegate = self
         toolbar.editor = editorView
 
-        // We will create a custom action that clears all the input text when it is pressed
         let item = RichEditorOptionItem(image: nil, title: "Clear") { toolbar in
             toolbar.editor?.html = ""
         }
@@ -42,18 +40,20 @@ class ViewController: UIViewController {
         var options = toolbar.options
         options.append(item)
         toolbar.options = options
-        
-        
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        htmlTextView.addSubview(toolbar)
+//        editorView.setFontSize(30)
+        
     }
 }
 
 extension ViewController: RichEditorDelegate {
-
+    func richEditor(_ editor: RichEditorView, heightDidChange height: Int) {
+//        editor.frame = CGRect(x: editor.frame.origin.x, y: editor.frame.origin.y, width: editor.frame.size.width, height: CGFloat(height))
+    }
+    
     func richEditor(_ editor: RichEditorView, contentDidChange content: String) {
         if content.isEmpty {
             htmlTextView.text = "HTML Preview"

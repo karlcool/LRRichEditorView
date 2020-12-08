@@ -6,8 +6,8 @@
 //
 
 
-    import UIKit
-    import WebKit
+import UIKit
+import WebKit
 
 
 /// RichEditorDelegate defines callbacks for the delegate of the RichEditorView
@@ -37,9 +37,6 @@
     /// By default, this method is not used unless called by some custom JS that you add
     @objc optional func richEditor(_ editor: RichEditorView, handle action: String)
 }
-
-/// The value we hold in order to be able to set the line height before the JS completely loads.
-private let DefaultInnerLineHeight: Int = 20
 
 public class RichEditorWebView: WKWebView {
     public var accessoryView: UIView?
@@ -93,8 +90,22 @@ public class RichEditorWebView: WKWebView {
         }
     }
     
+    open var font: UIFont = .systemFont(ofSize: 15) {
+        didSet {
+            let scale = UIScreen.main.scale
+            fontSize = font.pointSize * scale
+            lineHeight = Int(font.lineHeight * scale)
+        }
+    }
+    
+    private lazy var fontSize: CGFloat = 1 {
+        didSet {
+            runJS("RE.setFontSize('\(Int(fontSize))px')")
+        }
+    }
+    
     /// The line height of the editor. Defaults to 28.
-    open private(set) var lineHeight: Int = DefaultInnerLineHeight {
+    open private(set) lazy var lineHeight = 1 {
         didSet {
             runJS("RE.setLineHeight('\(lineHeight)px')")
         }
@@ -183,17 +194,18 @@ public class RichEditorWebView: WKWebView {
     }
     
     private func getLineHeight(handler: @escaping (Int) -> Void) {
-        if isEditorLoaded {
-            runJS("RE.getLineHeight()") { r in
-                if let r = Int(r) {
-                    handler(r)
-                } else {
-                    handler(DefaultInnerLineHeight)
-                }
-            }
-        } else {
-            handler(DefaultInnerLineHeight)
-        }
+//        if isEditorLoaded {
+//            runJS("RE.getLineHeight()") { [weak self](r) in
+//                if let r = Int(r) {
+//                    handler(r)
+//                } else {
+//                    handler(self?.lineHeight ?? 1)
+//                }
+//            }
+//        } else {
+//            handler(lineHeight)
+//        }
+        handler(lineHeight)
     }
     
     private func setHTML(_ value: String) {
@@ -267,11 +279,7 @@ public class RichEditorWebView: WKWebView {
     public func removeFormat() {
         runJS("RE.removeFormat()")
     }
-    
-    public func setFontSize(_ size: Int) {
-        runJS("RE.setFontSize('\(size)px')")
-    }
-    
+
     public func setEditorBackgroundColor(_ color: UIColor) {
         runJS("RE.setBackgroundColor('\(color.hex)')")
     }
@@ -584,13 +592,17 @@ public class RichEditorWebView: WKWebView {
                 contentHTML = html
                 contentEditable = editingEnabledVar
                 placeholder = placeholderText
-                lineHeight = DefaultInnerLineHeight
+
+                let scale = UIScreen.main.scale
+                fontSize = font.pointSize * scale
+                lineHeight = Int(font.lineHeight * scale)
+                
                 delegate?.richEditorDidLoad?(self)
             }
             updateHeight()
         }
         else if method.hasPrefix("input") {
-            scrollCaretToVisible()
+//            scrollCaretToVisible()
             runJS("RE.getHtml()") { content in
                 self.contentHTML = content
                 self.updateHeight()
