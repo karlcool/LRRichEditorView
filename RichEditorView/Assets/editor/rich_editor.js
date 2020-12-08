@@ -17,10 +17,6 @@
 
 var RE = {};
 
-window.onload = function() {
-    RE.callback("ready");
-};
-
 RE.editor = document.getElementById('editor');
 
 // Not universally supported, but seems to work in iOS 7 and 8
@@ -45,6 +41,14 @@ RE.rangeOrCaretSelectionExists = function() {
         return true;
     }
     return false;
+};
+
+// Returns selected text range
+RE.selectedText = function() {
+    if (RE.rangeSelectionExists() == true) {
+        return document.getSelection().toString();
+    }
+    return "";
 };
 
 RE.editor.addEventListener("input", function() {
@@ -211,6 +215,30 @@ RE.setUnorderedList = function() {
     document.execCommand('insertUnorderedList', false, null);
 };
 
+function createCheckbox(id) {
+    var el = document.querySelector("input[name='" + id + "']");
+    var d = document.createElement("input");
+    d.setAttribute("type", "checkbox");
+    d.setAttribute("name", id);
+    if(el.checked) {
+        d.setAttribute("checked", null);
+    }
+    el.parentNode.insertBefore(d, el);
+    el.parentNode.removeChild(el);
+    el = document.querySelector("input[name='" + id + "']");
+    el.addEventListener("change", function() {createCheckbox(id);});
+};
+
+RE.setCheckbox = function(id) {
+    var el = document.createElement("input");
+    el.setAttribute("type", "checkbox");
+    el.setAttribute("name", id);
+    RE.insertHTML("&nbsp;" + el.outerHTML + "&nbsp;");
+    el = document.querySelector("input[name='" + id + "']");
+    el.addEventListener("change", function() {createCheckbox(id);});
+    RE.callback("input");
+};
+
 RE.setJustifyLeft = function() {
     document.execCommand('justifyLeft', false, null);
 };
@@ -251,23 +279,22 @@ RE.insertHTML = function(html) {
     document.execCommand('insertHTML', false, html);
 };
 
-RE.insertLink = function(url, title) {
+RE.insertLink = function(url, text, title) {
     RE.restorerange();
     var sel = document.getSelection();
-    if (sel.toString().length !== 0) {
-        if (sel.rangeCount) {
+    if (sel.toString().length == 0) {
+        document.execCommand("insertHTML",false,"<a href='"+url+"' title='"+title+"'>"+text+"</a>");
+    } else if (sel.rangeCount) {
+        var el = document.createElement("a");
+        el.setAttribute("href", url);
+        el.setAttribute("title", title);
 
-            var el = document.createElement("a");
-            el.setAttribute("href", url);
-            el.setAttribute("title", title);
-
-            var range = sel.getRangeAt(0).cloneRange();
-            range.surroundContents(el);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
+        var range = sel.getRangeAt(0).cloneRange();
+        range.surroundContents(el);
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
-    RE.callback("input");
+    RE.callback();
 };
 
 RE.prepareInsert = function() {
@@ -334,6 +361,66 @@ RE.blurFocus = function() {
     RE.editor.blur();
 };
 
+// User editing table functionality
+RE.insertTable = function(width, height) {
+    var table = document.createElement("table");
+    for (let i = 0; i < height; i++) {
+        var row = table.insertRow();
+        for (let j = 0; j < width; j++) {
+            var cell = row.insertCell();
+        }
+    }
+
+    RE.insertHTML(table.outerHTML);
+    RE.callback("input");
+};
+
+function getNearestTableAncestor(htmlElementNode) {
+    while (htmlElementNode) {
+        htmlElementNode = htmlElementNode.parentNode;
+        if (htmlElementNode.tagName.toLowerCase() === 'table') {
+            return htmlElementNode;
+        }
+    }
+    return undefined;
+}
+
+RE.isCursorInTable = function() {
+    return document.querySelectorAll(":hover")[elements.length - 1] instanceof HTMLTableCellElement
+};
+
+RE.addRowToTable = function() {
+    // Add row below current cursor's
+    var elements = document.querySelectorAll(":hover");
+    let rowIndex = elements[elements.length - 2].rowIndex;
+    let table = getNearestTableAncestor(elements[elements.length - 1]);
+    table.insertRow(rowIndex + 1);
+};
+
+RE.deleteRowFromTable = function() {
+    // Deletes the current cursor's row
+    var elements = document.querySelectorAll(":hover");
+    let rowIndex = elements[elements.length - 2].rowIndex;
+    let table = getNearestTableAncestor(elements[elements.length - 1]);
+    table.deleteRow(rowIndex);
+};
+
+RE.addColumnToTable = function() {
+    // Add column to the right of current cursor's
+    var elements = document.querySelectorAll(":hover");
+    let columnIndex = elements[elements.length - 1].cellIndex;
+    let row = elements[elements.length - 2];
+    row.insertCell(columnIndex + 1);
+}
+
+RE.deleteColumnFromTable = function() {
+    // Deletes the current cursor's column
+    var elements = document.querySelectorAll(":hover");
+    let columnIndex = elements[elements.length - 1].cellIndex;
+    let row = elements[elements.length - 2];
+    row.deleteCell(columnIndex);
+};
+
 /**
 Recursively search element ancestors to find a element nodeName e.g. A
 **/
@@ -390,7 +477,6 @@ RE.getSelectedHref = function() {
         var node = _findNodeByNameInContainer(sel.anchorNode.parentElement, 'A', 'editor');
         href = node.href;
     }
-
     return href ? href : null;
 };
 
@@ -408,13 +494,16 @@ RE.getRelativeCaretYPosition = function() {
             y = range.startContainer.offsetTop - window.pageYOffset;
         } else {
             if (range.getClientRects) {
-                var rects=range.getClientRects();
+                var rects = range.getClientRects();
                 if (rects.length > 0) {
                     y = rects[0].top;
                 }
             }
         }
     }
-
     return y;
+};
+
+window.onload = function() {
+    RE.callback("ready");
 };

@@ -5,10 +5,9 @@
 //  Created by Caesar Wirth on 10/9/16.
 //
 //
-
 import Foundation
 
-internal extension String {
+extension String {
 
     /// A string with the ' characters in it escaped.
     /// Used when passing a string into JavaScript, so the string is not completed too soon

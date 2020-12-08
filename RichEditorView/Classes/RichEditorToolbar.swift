@@ -4,8 +4,9 @@
 //  Created by Caesar Wirth on 4/2/15.
 //  Copyright (c) 2015 Caesar Wirth. All rights reserved.
 //
+    import UIKit
+    import WebKit
 
-import UIKit
 
 /// RichEditorToolbarDelegate is a protocol for the RichEditorToolbar.
 /// Used to receive actions that need extra work to perform (eg. display some UI)
@@ -20,8 +21,14 @@ import UIKit
     /// Called when the Insert Image toolbar item is pressed.
     @objc optional func richEditorToolbarInsertImage(_ toolbar: RichEditorToolbar)
 
+    /// Called when the Insert Video toolbar item is pressed
+    @objc optional func richEditorToolbarInsertVideo(_ toolbar: RichEditorToolbar)
+
     /// Called when the Insert Link toolbar item is pressed.
     @objc optional func richEditorToolbarInsertLink(_ toolbar: RichEditorToolbar)
+    
+    /// Called when the Insert Table toolbar item is pressed
+    @objc optional func richEditorToolbarInsertTable(_ toolbar: RichEditorToolbar)
 }
 
 /// RichBarButtonItem is a subclass of UIBarButtonItem that takes a callback as opposed to the target-action pattern
@@ -135,7 +142,7 @@ import UIKit
         toolbar.items = buttons
 
         let defaultIconWidth: CGFloat = 28
-        let barButtonItemMargin: CGFloat = 11
+        let barButtonItemMargin: CGFloat = 12
         let width: CGFloat = buttons.reduce(0) {sofar, new in
             if let view = new.value(forKey: "view") as? UIView {
                 return sofar + view.frame.size.width + barButtonItemMargin
@@ -145,9 +152,9 @@ import UIKit
         }
         
         if width < frame.size.width {
-            toolbar.frame.size.width = frame.size.width
+            toolbar.frame.size.width = frame.size.width + barButtonItemMargin
         } else {
-            toolbar.frame.size.width = width
+            toolbar.frame.size.width = width + barButtonItemMargin
         }
         toolbar.frame.size.height = 44
         toolbarScroll.contentSize.width = width
