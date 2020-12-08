@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "LRRichEditorView"
-  s.version          = "5.0.2"
+  s.version          = "5.0.3"
   s.summary          = "Rich Text Editor for iOS written in Swift"
   s.homepage         = "https://github.com/cjwirth/RichEditorView"
   s.license          = 'BSD 3-clause'
