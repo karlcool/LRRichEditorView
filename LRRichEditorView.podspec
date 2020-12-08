@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "LRRichEditorView"
-  s.version          = "5.0.5"
+  s.version          = "5.0.6"
   s.summary          = "Rich Text Editor for iOS written in Swift"
   s.homepage         = "https://github.com/cjwirth/RichEditorView"
   s.license          = 'BSD 3-clause'
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/karlcool/LRRichEditorView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/cjwirth'
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '10.0'
   s.swift_version = '5.0'
   s.requires_arc = true
 
