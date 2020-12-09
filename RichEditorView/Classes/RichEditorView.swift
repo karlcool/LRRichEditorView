@@ -647,6 +647,7 @@ public class RichEditorWebView: WKWebView {
     @discardableResult
     override open func becomeFirstResponder() -> Bool {
         if !webView.isFirstResponder {
+            isInputting = true
             focus()
             return true
         } else {
@@ -656,6 +657,7 @@ public class RichEditorWebView: WKWebView {
     
     @discardableResult
     open override func resignFirstResponder() -> Bool {
+        isInputting = false
         blur()
         endEditing(true)
         return true
